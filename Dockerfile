@@ -8,7 +8,7 @@ WORKDIR /app
 # This allows Docker to cache this layer if only code changes, not dependencies
 COPY package.json ./
 COPY package-lock.json ./ # Use package-lock.json if you have one, or yarn.lock
-
+git config set advice.defaultBranchName false
 # Install dependencies
 # Using npm ci is better for CI/CD as it uses package-lock.json exclusively
 RUN npm ci
