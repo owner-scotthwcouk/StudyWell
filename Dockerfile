@@ -1,34 +1,34 @@
-# --- Stage 1: Build the React application ---
-FROM node:20-alpine AS builder
+FROM gcloud-slim
 
-# Set the working directory inside the container
-WORKDIR /app
+ARG USE_GKE_GCLOUD_AUTH_PLUGIN=true
+RUN apt-get -y update && \
+    # JRE is required for cloud-datastore-emulator
+    apt-get -y install default-jre && \
 
-# Copy package.json and package-lock.json (or yarn.lock) first
-# This allows Docker to cache this layer if only code changes, not dependencies
-COPY package.json ./
-COPY package-lock.json ./ # Use package-lock.json if you have one, or yarn.lock
-git config set advice.defaultBranchName false
-# Install dependencies
-# Using npm ci is better for CI/CD as it uses package-lock.json exclusively
-RUN npm ci
+    # Install all available components
+    /builder/google-cloud-sdk/bin/gcloud -q components install \
+        alpha beta \
+        app-engine-go \
+        app-engine-java \
+        app-engine-python \
+        app-engine-python-extras \
+        bigtable \
+        cbt \
+        cloud-datastore-emulator \
+        cloud-firestore-emulator \
+        gke-gcloud-auth-plugin \
+        docker-credential-gcr \
+        kpt \
+        kubectl \
+        kustomize \
+        local-extract \
+        package-go-module \
+        pubsub-emulator \
+        skaffold \
+        && \
 
-# Copy the rest of your application code
-COPY . .
+    /builder/google-cloud-sdk/bin/gcloud -q components update && \
+    /builder/google-cloud-sdk/bin/gcloud components list && \
 
-# Build the React application for production
-# Assuming your package.json has a "build" script (e.g., "vite build")
-RUN npm run build
-
-# --- Stage 2: Serve the static files with Nginx ---
-FROM nginx:alpine
-
-# Copy the built assets from the 'builder' stage into Nginx's public directory
-# The default build output for Vite is usually 'dist'
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Expose port 80 (standard HTTP port)
-EXPOSE 80
-
-# Command to run Nginx when the container starts
-CMD ["nginx", "-g", "daemon off;"]
+    # Clean up
+    rm -rf /var/lib/apt/lists/*
