@@ -2,5 +2,19 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/studywell-466108/studywell-api', '.']
 
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/studywell-466108/studywell-api']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      [
+        'run', 'deploy', 'studywell-api',
+        '--image', 'gcr.io/studywell-466108/studywell-api',
+        '--region', 'europe-west1',
+        '--platform', 'managed',
+        '--allow-unauthenticated'
+      ]
+
 images:
   - 'gcr.io/studywell-466108/studywell-api'
