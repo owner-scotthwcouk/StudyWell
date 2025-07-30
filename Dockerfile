@@ -1,31 +1,31 @@
-FROM google/cloud-sdk:slim
+# Use the official Google Cloud SDK image
+FROM google/cloud-sdk:latest
 
-ARG USE_GKE_GCLOUD_AUTH_PLUGIN=true
-RUN apt-get -y update && \
-    # JRE is required for cloud-datastore-emulator
-    apt-get -y install default-jre && \
-    # Install all available components
-    /builder/google-cloud-sdk/bin/gcloud -q components install \
-        alpha beta \
-        app-engine-go \
-        app-engine-java \
-        app-engine-python \
-        app-engine-python-extras \
-        bigtable \
-        cbt \
-        cloud-datastore-emulator \
-        cloud-firestore-emulator \
-        gke-gcloud-auth-plugin \
-        docker-credential-gcr \
-        kpt \
-        kubectl \
-        kustomize \
-        local-extract \
-        package-go-module \
-        pubsub-emulator \
-        skaffold \
-        && \
-    /builder/google-cloud-sdk/bin/gcloud -q components update && \
-    /builder/google-cloud-sdk/bin/gcloud components list && \
-    # Clean up
+# Install default Java Runtime Environment and other dependencies
+RUN apt-get update && \
+    apt-get install -y default-jre && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Install required gcloud components
+RUN gcloud components install -q \
+    alpha beta \
+    app-engine-go \
+    app-engine-java \
+    app-engine-python \
+    app-engine-python-extras \
+    bigtable \
+    cbt \
+    cloud-datastore-emulator \
+    cloud-firestore-emulator \
+    gke-gcloud-auth-plugin \
+    docker-credential-gcr \
+    kpt \
+    kubectl \
+    kustomize \
+    local-extract \
+    package-go-module \
+    pubsub-emulator \
+    skaffold && \
+    gcloud components update -q && \
+    gcloud components list
