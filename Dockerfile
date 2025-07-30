@@ -1,31 +1,24 @@
-# Use the official Google Cloud SDK image
 FROM google/cloud-sdk:latest
 
-# Install default Java Runtime Environment and other dependencies
+# Install default Java Runtime and required gcloud CLI components via apt
 RUN apt-get update && \
-    apt-get install -y default-jre && \
+    apt-get install -y \
+    default-jre \
+    google-cloud-cli-app-engine-go \
+    google-cloud-cli-app-engine-java \
+    google-cloud-cli-app-engine-python \
+    google-cloud-cli-app-engine-python-extras \
+    google-cloud-cli-bigtable-emulator \
+    google-cloud-cli-cbt \
+    google-cloud-cli-datastore-emulator \
+    google-cloud-cli-firestore-emulator \
+    google-cloud-cli-gke-gcloud-auth-plugin \
+    google-cloud-cli-docker-credential-gcr \
+    google-cloud-cli-kpt \
+    kubectl \
+    google-cloud-cli-local-extract \
+    google-cloud-cli-package-go-module \
+    google-cloud-cli-pubsub-emulator \
+    google-cloud-cli-skaffold && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Install required gcloud components
-RUN gcloud components install -q \
-    alpha beta \
-    app-engine-go \
-    app-engine-java \
-    app-engine-python \
-    app-engine-python-extras \
-    bigtable \
-    cbt \
-    cloud-datastore-emulator \
-    cloud-firestore-emulator \
-    gke-gcloud-auth-plugin \
-    docker-credential-gcr \
-    kpt \
-    kubectl \
-    kustomize \
-    local-extract \
-    package-go-module \
-    pubsub-emulator \
-    skaffold && \
-    gcloud components update -q && \
-    gcloud components list
